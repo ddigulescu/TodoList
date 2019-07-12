@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useReducer, useState, useEffect } from 'react';
+import Form from './components/Form';
+import Filter from './components/Filter';
+import TodoList from './components/TodoList';
+import AppContext from './AppContext';
+import todosReducer from './todosReducer';
+import { ALL } from './useFilter';
+
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    const [todos, todosDispatch] = useReducer(
+        todosReducer,
+        JSON.parse(localStorage.getItem('todos')) || []
+    );
 
+    const [activeFilter, setActiveFilter] = useState(ALL);
+
+    useEffect(() => {
+        localStorage.setItem('todos', JSON.stringify(todos));
+    }, [todos]);
+
+    return (
+        <AppContext.Provider value={{ todos, todosDispatch }}>
+            <div className="todo-app">
+                <Form />
+                <Filter setActiveFilter={setActiveFilter} />
+                <TodoList filter={activeFilter} />
+            </div>
+        </AppContext.Provider>
+    );
+}
 export default App;
